@@ -48,125 +48,86 @@ business_flow:
         B --> C[步骤2]
         C --> D[结束]
     steps:
-      - step_id: S001
+      - step_id: S1
         step_name: 步骤1名称
         step_desc: 步骤描述
         actor: 执行角色
         action: 执行动作
-        output: 输出结果
-      - step_id: S002
+      - step_id: S2
         step_name: 步骤2名称
         step_desc: 步骤描述
         actor: 执行角色
         action: 执行动作
-        output: 输出结果
-
+  
   branch_flows:
     - flow_id: BF001
-      flow_name: 分支流程1（如：审批通过流程）
-      condition: 触发条件
+      flow_name: 分支流程1
+      trigger: 触发条件
       mermaid: |
         flowchart TD
-          A --> B --> C
-      steps: []
-
-  exception_flows:
-    - flow_id: EF001
-      flow_name: 异常流程1（如：审批驳回）
-      exception: 异常场景
-      handling: 处理方式
-      mermaid: |
-        flowchart TD
-          A --> B --> C
-      steps: []
+          A --> B
+          B --> C
 
 # 5.2 业务模型
 business_model:
   entities:
     - entity_id: E001
-      entity_name: 实体名称（如：客户）
+      entity_name: 实体名称
       entity_desc: 实体描述
       attributes:
         - attr_name: 属性名
-          attr_type: 数据类型
+          attr_type: 属性类型
           attr_desc: 属性描述
-          is_key: true/false
       relationships:
-        - rel_type: 一对一/一对多/多对多
-          target_entity: 关联实体
-          rel_desc: 关系描述
+        - target_entity: 关联实体
+          relation_type: 一对多/多对多/一对一
+          relation_desc: 关联描述
 
-  data_flow:
-    description: 核心数据流转描述
-    mermaid: |
-      flowchart LR
-        A[数据源] --> B[数据处理]
-        B --> C[数据存储]
-        C --> D[数据展示]
-
-# 功能模块规划
-modules_plan:
+# 5.3 功能模块规划
+modules:
   - module_id: M001
-    module_name: 功能模块名称
-    module_desc: 模块功能简述
+    module_name: 模块名称
+    module_desc: 模块描述
     priority: P0/P1/P2
-    dependencies: [依赖模块ID]
-    pages: [关联页面ID]
+    related_pages: [P001, P002]
+    related_entities: [E001, E002]
     status: pending
-
-  - module_id: M002
-    module_name: 功能模块名称
-    module_desc: 模块功能简述
-    priority: P0/P1/P2
-    dependencies: [M001]
-    pages: []
-    status: pending
-
-# 接口规范定义
-interface_standard:
-  base_url: /api/v1
-  auth_type: JWT/OAuth2/Session
-  request_format: JSON
-  response_format: JSON
-  
-  standard_fields:
-    request:
-      - field_name: timestamp
-        field_type: long
-        field_desc: 请求时间戳
-      - field_name: trace_id
-        field_type: string
-        field_desc: 链路追踪ID
     
-    response:
-      - field_name: code
-        field_type: int
-        field_desc: 状态码
-      - field_name: message
-        field_type: string
-        field_desc: 响应消息
-      - field_name: data
-        field_type: object
-        field_desc: 响应数据
+  - module_id: M002
+    module_name: 模块名称
+    module_desc: 模块描述
+    priority: P1
+    related_pages: [P003]
+    related_entities: [E003]
+    status: pending
 
-  error_code_standard:
-    - code: 200
-      message: 成功
-    - code: 400
-      message: 请求参数错误
-    - code: 401
-      message: 未授权
-    - code: 403
-      message: 禁止访问
-    - code: 404
-      message: 资源不存在
-    - code: 500
-      message: 服务器内部错误
+# 5.4 系统集成点
+integrations:
+  - system: 外部系统名称
+    integration_type: 数据同步/单点登录/消息推送
+    description: 集成描述
+    data_flow: 数据流向说明
 ```
 
-## 强制约束
-- 只生成整体框架，不生成具体功能模块的详细内容
-- 业务流程必须覆盖主流程、分支流程、异常流程
-- 业务模型必须明确实体关系和关键属性
-- 功能模块规划必须完整，为后续模块生成器提供清单
-- 全程使用中文输出
+## 设计原则
+
+### 业务流程设计
+- 必须覆盖主流程和关键分支
+- 每个步骤必须明确执行角色
+- 必须考虑异常处理流程
+
+### 业务模型设计
+- 实体必须覆盖所有业务对象
+- 关系必须准确（1:N, N:M, 1:1）
+- 属性必须完整但不过度设计
+
+### 模块划分原则
+- 高内聚：模块内部功能相关
+- 低耦合：模块间依赖最小
+- 优先级：核心业务优先（P0）
+
+## 输出要求
+- 流程图必须使用 Mermaid 语法
+- 实体关系必须清晰
+- 模块划分必须合理
+- 全程使用中文
