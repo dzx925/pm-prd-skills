@@ -1,6 +1,6 @@
 ---
 name: solution-merger
-version: 1.2.0
+version: 1.3.0
 description: 方案合并器，合并方案框架和各功能模块，生成完整的PRD第5章
 scope: global
 ---

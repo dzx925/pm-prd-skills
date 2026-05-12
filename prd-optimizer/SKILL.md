@@ -1,6 +1,6 @@
 ---
 name: prd-optimizer
-version: 1.2.0
+version: 1.3.0
 description: PRD优化器，检查并优化PRD文档的完整性、逻辑性、可执行性，输出最终版本
 scope: global
 ---
@@ -19,7 +19,8 @@ scope: global
 - section_1_3_business.md（业务章节）
 - section_4_analysis.md（分析章节）
 - section_5_solution.md（方案章节）
-- section_8_plan.md（计划章节）
+- section_6_non_functional.md（非功能性需求章节）
+- section_7_8_plan.md（计划章节）
 
 ## 工作流程
 1. **完整性检查**：检查章节是否齐全

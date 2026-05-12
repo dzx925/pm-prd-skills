@@ -1,6 +1,6 @@
 ---
 name: prd-plan-section
-version: 1.2.0
+version: 1.3.0
 description: PRD计划章节生成器，生成PRD第7-8章（上线计划、附录）
 scope: global
 ---

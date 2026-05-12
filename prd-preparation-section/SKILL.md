@@ -1,6 +1,6 @@
 ---
 name: prd-preparation-section
-version: 1.2.0
+version: 1.3.0
 description: PRD非功能性需求生成器，生成PRD第6章（非功能性需求：性能、权限、兼容、可维护）
 scope: global
 ---
