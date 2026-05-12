@@ -1,6 +1,6 @@
 ---
 name: solution-merger
-version: 1.1.0
+version: 1.2.0
 description: 方案合并器，合并方案框架和各功能模块，生成完整的PRD第5章
 scope: global
 ---
@@ -31,7 +31,7 @@ scope: global
 ### 输出文件名：section_5_solution.md
 
 ```markdown
-## 五、解决方案
+## 五、产品方案
 
 ### 5.1 业务流程
 ### 5.2 业务模型
