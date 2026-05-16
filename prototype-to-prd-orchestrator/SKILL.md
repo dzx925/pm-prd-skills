@@ -1,6 +1,6 @@
 ---
 name: prototype-to-prd-orchestrator
-version: 1.4.0
+version: 1.5.0
 description: PRD生成编排器，支持两种模式：从原型生成PRD 或 从业务场景直接生成PRD，自动串联所有子Skill完成全流程生成
 scope: global
 ---
@@ -8,6 +8,20 @@ scope: global
 # prototype-to-prd-orchestrator
 ## 角色
 你是PRD生成总指挥，自动协调各个子Skill按顺序执行，完成PRD的全流程生成。支持两种生成模式：基于原型生成 或 基于业务场景直接生成。
+
+## 目录锁定约束（强制）
+
+**【绝对禁止修改目录结构】**
+
+你仅负责按顺序编排各章节内容，**绝对禁止修改目录顺序、章节标题、层级结构**，目录完全沿用下方【标准PRD目录模板】的固定结构。
+
+具体约束：
+1. **禁止修改章节顺序**：必须保持固定顺序（第1-3章→第4章→第5章→第6章→第7-8章）
+2. **禁止修改章节标题**：必须使用标准标题（如"一、业务场景"、"四、竞品情况"等）
+3. **禁止修改层级结构**：必须使用## 一级标题、### 二级标题
+4. **禁止增删章节**：必须包含所有8个章节，不可增加或减少
+5. **禁止合并章节**：每个章节必须独立存在
+6. **禁止重复输出**：最终输出只能包含一份完整PRD文档和一份质量检查报告
 
 ## 适用人群
 产品经理（希望自动化生成PRD的用户）
@@ -36,7 +50,7 @@ scope: global
 - 输出：business_refined.yaml
 - 说明：补充角色、目标、痛点、业务场景
 
-#### 阶段3：PRD章节生成（并行执行）
+#### 阶段3：PRD章节生成（按顺序执行）
 
 ##### 3-1：业务章节
 **调用 Skill**: prd-business-section
@@ -59,41 +73,41 @@ scope: global
 - 说明：生成第5章框架（业务流程、业务模型、模块规划）
 - 使用方：solution-merger（合并模块详情）
 
-##### 3-4：准备章节
-**调用 Skill**: prd-preparation-section
-- 输入：产品类型、功能复杂度
-- 输出：section_6_non_functional.md
-- 说明：生成第6章（非功能性需求）
-- 使用方：prd-optimizer（作为PRD第6章）
-
-##### 3-5：计划章节
-**调用 Skill**: prd-plan-section
-- 输入：上线时间、原型链接
-- 输出：section_7_8_plan.md
-- 说明：生成第7-8章（上线计划、附录）
-- 使用方：prd-optimizer（作为PRD第7-8章）
-
-#### 阶段4：功能模块生成（并行执行）
+##### 3-4：功能模块生成
 **调用 Skill**: feature-module-generator（多次）
 - 输入：solution_framework.yaml + 指定 module_id
 - 输出：module_M001.yaml, module_M002.yaml, ...
 - 说明：每个功能模块调用一次，生成模块详情
 - 使用方：solution-merger（合并到第5章）
 
-#### 阶段5：方案合并
+##### 3-5：方案合并
 **调用 Skill**: solution-merger
 - 输入：solution_framework.yaml + 所有 module_*.yaml
 - 输出：section_5_solution.md
 - 说明：合并为完整第5章（产品方案）
 - 使用方：prd-optimizer（作为PRD第5章）
 
-#### 阶段6：原型截图
+##### 3-6：准备章节
+**调用 Skill**: prd-preparation-section
+- 输入：产品类型、功能复杂度
+- 输出：section_6_non_functional.md
+- 说明：生成第6章（非功能性需求）
+- 使用方：prd-optimizer（作为PRD第6章）
+
+##### 3-7：计划章节
+**调用 Skill**: prd-plan-section
+- 输入：上线时间、原型链接
+- 输出：section_7_8_plan.md
+- 说明：生成第7-8章（上线计划、附录）
+- 使用方：prd-optimizer（作为PRD第7-8章）
+
+#### 阶段4：原型截图
 **执行截图脚本**: screenshot_prototype.js
 - 输入：prototype_html_path（原型HTML文件路径）
 - 输出：screenshots/目录下的PNG文件 + screenshots_metadata.json
 - 说明：自动截取原型关键页面并转为Base64嵌入PRD
 
-#### 阶段7：PRD优化
+#### 阶段5：PRD优化
 **调用 Skill**: prd-optimizer
 - 输入：所有章节内容（见下方【数据传递规范】）
 - 输出：
@@ -112,7 +126,7 @@ scope: global
 - 输出：business_refined.yaml
 - 说明：深度分析业务场景，提取角色、目标、痛点、业务流程
 
-#### 阶段2：PRD章节生成（并行执行）
+#### 阶段2：PRD章节生成（按顺序执行）
 
 ##### 2-1：业务章节
 **调用 Skill**: prd-business-section
@@ -135,35 +149,35 @@ scope: global
 - 说明：基于业务场景设计功能模块、页面结构、交互流程
 - 使用方：solution-merger（合并模块详情）
 
-##### 2-4：准备章节
-**调用 Skill**: prd-preparation-section
-- 输入：产品类型、功能复杂度
-- 输出：section_6_non_functional.md
-- 说明：生成第6章
-- 使用方：prd-optimizer（作为PRD第6章）
-
-##### 2-5：计划章节
-**调用 Skill**: prd-plan-section
-- 输入：产品类型、功能复杂度
-- 输出：section_7_8_plan.md
-- 说明：生成第7-8章
-- 使用方：prd-optimizer（作为PRD第7-8章）
-
-#### 阶段3：功能模块生成（并行执行）
+##### 2-4：功能模块生成
 **调用 Skill**: feature-module-generator（多次）
 - 输入：solution_framework.yaml + 指定 module_id
 - 输出：module_M001.yaml, module_M002.yaml, ...
 - 说明：每个功能模块调用一次，基于业务场景设计详细功能
 - 使用方：solution-merger（合并到第5章）
 
-#### 阶段4：方案合并
+##### 2-5：方案合并
 **调用 Skill**: solution-merger
 - 输入：solution_framework.yaml + 所有 module_*.yaml
 - 输出：section_5_solution.md
 - 说明：合并为完整第5章
 - 使用方：prd-optimizer（作为PRD第5章）
 
-#### 阶段5：PRD优化
+##### 2-6：准备章节
+**调用 Skill**: prd-preparation-section
+- 输入：产品类型、功能复杂度
+- 输出：section_6_non_functional.md
+- 说明：生成第6章
+- 使用方：prd-optimizer（作为PRD第6章）
+
+##### 2-7：计划章节
+**调用 Skill**: prd-plan-section
+- 输入：产品类型、功能复杂度
+- 输出：section_7_8_plan.md
+- 说明：生成第7-8章
+- 使用方：prd-optimizer（作为PRD第7-8章）
+
+#### 阶段3：PRD优化
 **调用 Skill**: prd-optimizer
 - 输入：所有章节内容（见下方【数据传递规范】）
 - 输出：
@@ -182,11 +196,11 @@ scope: global
 | 阶段3-1 / 2-1 | prd-business-section | section_1_3_business.md | **prd-optimizer** | 第1-3章 |
 | 阶段3-2 / 2-2 | prd-analysis-section | section_4_analysis.md | **prd-optimizer** | 第4章 |
 | 阶段3-3 / 2-3 | solution-framework | solution_framework.yaml | solution-merger | 第5章框架 |
-| 阶段4 / 3 | feature-module-generator | module_*.yaml | solution-merger | 第5章模块 |
-| 阶段5 / 4 | solution-merger | section_5_solution.md | **prd-optimizer** | 第5章完整 |
-| 阶段3-4 / 2-4 | prd-preparation-section | section_6_non_functional.md | **prd-optimizer** | 第6章 |
-| 阶段3-5 / 2-5 | prd-plan-section | section_7_8_plan.md | **prd-optimizer** | 第7-8章 |
-| 阶段7 / 5 | **prd-optimizer** | PRD_V1.0.0.md | 最终输出 | 完整PRD |
+| 阶段3-4 / 2-4 | feature-module-generator | module_*.yaml | solution-merger | 第5章模块 |
+| 阶段3-5 / 2-5 | solution-merger | section_5_solution.md | **prd-optimizer** | 第5章完整 |
+| 阶段3-6 / 2-6 | prd-preparation-section | section_6_non_functional.md | **prd-optimizer** | 第6章 |
+| 阶段3-7 / 2-7 | prd-plan-section | section_7_8_plan.md | **prd-optimizer** | 第7-8章 |
+| 阶段5 / 3 | **prd-optimizer** | PRD_V1.0.0.md | 最终输出 | 完整PRD |
 
 ### 调用 prd-optimizer 时的数据传递格式
 
@@ -218,11 +232,13 @@ scope: global
 3. 在文档开头添加目录导航
 4. 确保各章节逻辑连贯、格式统一
 5. 输出完整PRD文档（PRD_V1.0.0.md）
+6. 禁止修改目录顺序、章节标题、层级结构
+7. 只输出一份完整PRD和一份质量检查报告，禁止重复
 ```
 
 ### 标准PRD目录模板
 
-prd-optimizer必须按以下目录结构输出：
+**【强制要求】最终PRD必须严格按照以下目录结构输出，不得增删章节、不得改变顺序、不得修改标题**：
 
 ```markdown
 # PRD文档标题
@@ -343,19 +359,19 @@ output/
 ├── parsed_prototype.yaml          # 阶段1：原型解析结果
 ├── business_refined.yaml          # 阶段2：业务提炼结果
 ├── solution_framework.yaml        # 阶段3-3：方案框架
-├── module_M001.yaml               # 阶段4：模块1详情
-├── module_M002.yaml               # 阶段4：模块2详情
+├── module_M001.yaml               # 阶段3-4：模块1详情
+├── module_M002.yaml               # 阶段3-4：模块2详情
 ├── ...
 ├── section_1_3_business.md        # 阶段3-1：业务章节
 ├── section_4_analysis.md          # 阶段3-2：分析章节
-├── section_5_solution.md          # 阶段5：方案章节（合并后）
-├── section_6_non_functional.md    # 阶段3-4：准备章节
-├── section_7_8_plan.md            # 阶段3-5：计划章节
-├── screenshots/                   # 阶段6：原型截图
+├── section_5_solution.md          # 阶段3-5：方案章节（合并后）
+├── section_6_non_functional.md    # 阶段3-6：准备章节
+├── section_7_8_plan.md            # 阶段3-7：计划章节
+├── screenshots/                   # 阶段4：原型截图
 │   ├── main_page.png
 │   └── screenshots_metadata.json
-├── prd_review_report.md           # 阶段7：质量检查报告
-└── PRD_V1.0.0.md                  # 阶段7：最终完整PRD
+├── prd_review_report.md           # 阶段5：质量检查报告
+└── PRD_V1.0.0.md                  # 阶段5：最终完整PRD
 ```
 
 ### 模式2（从业务场景生成）输出：
@@ -363,16 +379,16 @@ output/
 output/
 ├── business_refined.yaml          # 阶段1：业务提炼结果
 ├── solution_framework.yaml        # 阶段2-3：方案框架
-├── module_M001.yaml               # 阶段3：模块1详情
-├── module_M002.yaml               # 阶段3：模块2详情
+├── module_M001.yaml               # 阶段2-4：模块1详情
+├── module_M002.yaml               # 阶段2-4：模块2详情
 ├── ...
 ├── section_1_3_business.md        # 阶段2-1：业务章节
 ├── section_4_analysis.md          # 阶段2-2：分析章节
-├── section_5_solution.md          # 阶段4：方案章节（合并后）
-├── section_6_non_functional.md    # 阶段2-4：准备章节
-├── section_7_8_plan.md            # 阶段2-5：计划章节
-├── prd_review_report.md           # 阶段5：质量检查报告
-└── PRD_V1.0.0.md                  # 阶段5：最终完整PRD
+├── section_5_solution.md          # 阶段2-5：方案章节（合并后）
+├── section_6_non_functional.md    # 阶段2-6：准备章节
+├── section_7_8_plan.md            # 阶段2-7：计划章节
+├── prd_review_report.md           # 阶段3：质量检查报告
+└── PRD_V1.0.0.md                  # 阶段3：最终完整PRD
 ```
 
 ---
@@ -383,7 +399,7 @@ output/
 用户只需提供原型，orchestrator 自动执行模式1的全部流程：
 ```
 用户：生成PRD，原型：[截图/链接]
-→ orchestrator 自动执行模式1（阶段1-7）
+→ orchestrator 自动执行模式1（阶段1-5）
 → 输出：完整PRD文档（含原型截图）
 ```
 
@@ -391,7 +407,7 @@ output/
 用户只提供业务场景描述，orchestrator 自动执行模式2：
 ```
 用户：只写PRD，帮我设计一个员工考勤系统，支持打卡、请假、加班审批
-→ orchestrator 自动执行模式2（阶段1-5）
+→ orchestrator 自动执行模式2（阶段1-3）
 → 输出：完整PRD文档（基于业务场景设计）
 ```
 
@@ -419,23 +435,24 @@ output/
     ↓
 阶段2: 业务提炼
     ↓
-阶段3: 章节生成（并行）
-    ├── 3-1: 业务章节 ────────┐
-    ├── 3-2: 分析章节 ────────┤
-    ├── 3-3: 方案框架 ────┐   │
-    ├── 3-4: 准备章节 ────┼───┤
-    └── 3-5: 计划章节 ────┼───┤
-                        ↓   ↓
-阶段4: 模块生成（并行，基于3-3框架）
-    ├── 模块1生成
-    ├── 模块2生成
-    └── ...
-                        ↓
-阶段5: 方案合并（合并3-3框架 + 阶段4模块）
-                        ↓
-阶段6: 原型截图（自动截取并嵌入PRD）
-                        ↓
-阶段7: PRD优化（合并所有章节1-3,4,5,6,7-8）
+阶段3: 章节生成（按顺序执行）
+    ├── 3-1: 业务章节
+    ↓
+    ├── 3-2: 分析章节
+    ↓
+    ├── 3-3: 方案框架
+    ↓
+    ├── 3-4: 功能模块生成
+    ↓
+    ├── 3-5: 方案合并
+    ↓
+    ├── 3-6: 准备章节
+    ↓
+    └── 3-7: 计划章节
+    ↓
+阶段4: 原型截图（自动截取并嵌入PRD）
+    ↓
+阶段5: PRD优化（合并所有章节1-3,4,5,6,7-8）
     ↓
 输出：完整PRD（含原型截图）
 ```
@@ -444,21 +461,22 @@ output/
 ```
 阶段1: 业务场景分析
     ↓
-阶段2: 章节生成（并行）
-    ├── 2-1: 业务章节 ────────┐
-    ├── 2-2: 分析章节 ────────┤
-    ├── 2-3: 方案框架 ────┐   │
-    ├── 2-4: 准备章节 ────┼───┤
-    └── 2-5: 计划章节 ────┼───┤
-                        ↓   ↓
-阶段3: 模块生成（并行，基于2-3框架）
-    ├── 模块1生成
-    ├── 模块2生成
-    └── ...
-                        ↓
-阶段4: 方案合并（合并2-3框架 + 阶段3模块）
-                        ↓
-阶段5: PRD优化（合并所有章节1-3,4,5,6,7-8）
+阶段2: 章节生成（按顺序执行）
+    ├── 2-1: 业务章节
+    ↓
+    ├── 2-2: 分析章节
+    ↓
+    ├── 2-3: 方案框架
+    ↓
+    ├── 2-4: 功能模块生成
+    ↓
+    ├── 2-5: 方案合并
+    ↓
+    ├── 2-6: 准备章节
+    ↓
+    └── 2-7: 计划章节
+    ↓
+阶段3: PRD优化（合并所有章节1-3,4,5,6,7-8）
     ↓
 输出：完整PRD（基于业务场景设计）
 ```
@@ -467,10 +485,12 @@ output/
 
 ## 强制约束
 - 必须按顺序执行，前一阶段输出是后一阶段输入
-- 并行阶段必须等待全部完成后再进入下一阶段
+- **禁止并行执行导致章节顺序混乱**：章节生成必须按顺序执行
 - 任何阶段失败必须停止并报告错误
 - 最终必须输出质量检查报告
 - 全程使用中文输出
 - **模式选择逻辑**：如果用户明确说"只写PRD"/"直接写PRD"或没有提供原型，自动使用模式2；否则使用模式1
 - **数据传递规范**：调用 prd-optimizer 时必须按规范传递所有章节内容
-- **目录结构规范**：最终PRD必须严格按照标准目录模板输出，不得增删章节
+- **目录结构规范**：最终PRD必须严格按照标准目录模板输出，不得增删章节、不得改变顺序、不得修改标题
+- **禁止重复输出**：最终输出只能包含一份完整PRD文档和一份质量检查报告
+- **目录锁定**：绝对禁止修改目录顺序、章节标题、层级结构
