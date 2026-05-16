@@ -1,7 +1,7 @@
 ---
 name: prd-plan-section
-version: 1.5.0
-description: PRD计划章节生成器，生成PRD第7-8章（上线计划、附录）
+version: 1.6.0
+description: PRD计划章节生成器，生成PRD第7-8章（上线计划、附录），输出内容供prd-optimizer整合
 scope: global
 ---
 
@@ -32,10 +32,9 @@ scope: global
 ## 工作流程
 1. **确定上线计划**：时间、范围、回滚方案
 2. **整理附录**：原型链接、参考文档
-3. **输出Markdown格式**
+3. **输出章节内容**
 
 ## 输出规范
-### 输出文件名：section_7_8_plan.md
 
 ```markdown
 ## 七、上线计划
@@ -56,7 +55,7 @@ scope: global
 
 ## 输出说明
 
-- **输出文件**：section_7_8_plan.md
+- **输出内容**：section_7_8_plan（章节内容，无文件后缀）
 - **使用方**：prd-optimizer（作为PRD第7-8章）
 - **章节对应**：
   - 第7章：上线计划
@@ -69,3 +68,4 @@ scope: global
 - 全程使用中文
 - **禁止输出目录导航**：只输出章节内容，不包含目录导航
 - **禁止输出文档信息**：不包含版本号、日期等元数据
+- **禁止输出文件名**：只输出章节内容，不提及输出文件名
