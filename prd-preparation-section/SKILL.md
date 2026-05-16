@@ -1,6 +1,6 @@
 ---
 name: prd-preparation-section
-version: 1.3.0
+version: 1.4.0
 description: PRD非功能性需求生成器，生成PRD第6章（非功能性需求：性能、权限、兼容、可维护）
 scope: global
 ---
@@ -47,6 +47,14 @@ scope: global
   ### 6.1 性能要求
   暂无
   ```
+
+## 输出说明
+
+- **输出文件**：section_6_non_functional.md
+- **使用方**：prd-optimizer（作为PRD第6章）
+- **章节对应**：第6章：非功能性需求（6.1-6.4）
+- **格式要求**：Markdown，必须包含所有标准子章节
+- **下游依赖**：prd-optimizer 会将此输出整合到最终PRD的第6章
 
 ## 输出要求
 - 非功能性需求必须可量化
