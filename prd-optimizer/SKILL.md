@@ -1,7 +1,7 @@
 ---
 name: prd-optimizer
-version: 1.7.0
-description: PRD优化器，接收各章节内容，按标准目录结构整合生成最终PRD文档
+version: 1.8.0
+description: PRD优化器，接收各章节内容，按标准目录结构整合生成最终PRD文档，支持HTML和MD双格式输出
 scope: global
 ---
 
@@ -12,6 +12,7 @@ scope: global
 2. 按标准目录结构整合
 3. 检查文档完整性、逻辑一致性
 4. 输出格式规范、内容完整的最终PRD
+5. 同时输出HTML和MD两种格式，HTML为主，MD作为可下载文件
 
 ## 目录锁定约束（强制）
 
@@ -74,7 +75,7 @@ scope: global
 2. 每个子章节必须有内容，无内容则填"暂无"
 3. 在文档开头添加目录导航
 4. 确保各章节逻辑连贯、格式统一
-5. 输出完整PRD文档（PRD_V1.0.0.md）
+5. 输出完整PRD文档（HTML为主，MD作为可下载文件）
 ```
 
 **格式B（简化格式）：**
@@ -119,7 +120,8 @@ scope: global
 9. **逻辑一致性检查**：检查各章节间逻辑是否一致
 10. **格式规范检查**：检查表格、列表、标题格式
 11. **生成质量检查报告**：输出 prd_review_report.md
-12. **生成最终PRD**：输出 PRD_V1.0.0.md
+12. **生成HTML格式PRD**：输出 PRD_V1.0.0.html（主要输出格式）
+13. **生成MD格式PRD**：输出 PRD_V1.0.0.md（可下载格式）
 
 ## 章节提取规则（用于方式2和方式3）
 
@@ -256,6 +258,168 @@ scope: global
 [内容或"暂无"]
 ```
 
+## HTML输出格式规范（强制）
+
+### HTML结构要求
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRD文档标题</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        /* 全局样式 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; line-height: 1.8; color: #333; background: #f5f5f5; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        .content-wrap { background: #fff; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); padding: 60px; min-height: 100vh; }
+        
+        /* 悬浮目录 */
+        .float-toc { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); width: 220px; background: #fff; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.15); padding: 20px; z-index: 1000; }
+        .float-toc h4 { font-size: 14px; font-weight: 600; color: #666; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .float-toc ul { list-style: none; }
+        .float-toc li { margin-bottom: 8px; }
+        .float-toc a { font-size: 13px; color: #666; text-decoration: none; transition: color 0.2s; }
+        .float-toc a:hover { color: #1890ff; }
+        .float-toc .active { color: #1890ff; font-weight: 500; }
+        
+        /* 标题样式 */
+        h1 { font-size: 28px; font-weight: 700; color: #1a1a1a; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #1890ff; }
+        h2 { font-size: 22px; font-weight: 600; color: #2a2a2a; margin: 40px 0 20px; padding-left: 12px; border-left: 4px solid #1890ff; }
+        h3 { font-size: 16px; font-weight: 600; color: #3a3a3a; margin: 25px 0 15px; }
+        h4 { font-size: 14px; font-weight: 600; color: #4a4a4a; margin: 20px 0 10px; }
+        
+        /* 段落和列表 */
+        p { margin-bottom: 15px; text-indent: 2em; }
+        ul, ol { margin: 15px 0; padding-left: 2em; }
+        li { margin-bottom: 8px; }
+        
+        /* 表格样式 */
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+        th, td { padding: 12px; text-align: left; border: 1px solid #e8e8e8; }
+        th { background: #fafafa; font-weight: 600; color: #555; }
+        tr:hover { background: #f9f9f9; }
+        
+        /* 代码块 */
+        pre { background: #f5f5f5; border-radius: 6px; padding: 16px; margin: 15px 0; overflow-x: auto; font-family: 'Monaco', 'Menlo', monospace; font-size: 13px; line-height: 1.6; }
+        code { background: #f5f5f5; padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'Monaco', 'Menlo', monospace; }
+        
+        /* 分隔线 */
+        hr { border: none; border-top: 1px dashed #d9d9d9; margin: 30px 0; }
+        
+        /* 文档信息 */
+        .doc-info { background: #f8f9fa; padding: 20px; border-radius: 6px; margin-bottom: 20px; }
+        .doc-info p { margin-bottom: 8px; text-indent: 0; }
+        
+        /* Mermaid流程图 */
+        .mermaid { margin: 20px 0; text-align: center; }
+        
+        /* 响应式 */
+        @media (max-width: 1400px) { .float-toc { display: none; } }
+        @media (max-width: 768px) { 
+            .content-wrap { padding: 20px; } 
+            h1 { font-size: 22px; }
+            h2 { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 悬浮目录 -->
+    <div class="float-toc">
+        <h4>目录导航</h4>
+        <ul>
+            <li><a href="#sec-1" class="active">一、业务场景</a></li>
+            <li><a href="#sec-2">二、问题来源</a></li>
+            <li><a href="#sec-3">三、目标</a></li>
+            <li><a href="#sec-4">四、竞品情况</a></li>
+            <li><a href="#sec-5">五、产品方案</a></li>
+            <li><a href="#sec-6">六、非功能性需求</a></li>
+            <li><a href="#sec-7">七、上线计划</a></li>
+            <li><a href="#sec-8">八、附录</a></li>
+        </ul>
+    </div>
+    
+    <div class="container">
+        <div class="content-wrap">
+            <!-- PRD内容 -->
+            <h1>PRD文档标题</h1>
+            
+            <div class="doc-info">
+                <p><strong>版本号：</strong>V1.0.0</p>
+                <p><strong>创建日期：</strong>2024-01-01</p>
+                <p><strong>状态：</strong>初稿/评审中/已定稿</p>
+            </div>
+            
+            <!-- 修订记录表格 -->
+            <table>
+                <thead>
+                    <tr><th>版本</th><th>日期</th><th>修改人</th><th>修改内容</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>V1.0.0</td><td>2024-01-01</td><td>作者</td><td>初始化</td></tr>
+                </tbody>
+            </table>
+            
+            <hr>
+            
+            <h2 id="sec-1">一、业务场景</h2>
+            <h3>1.1 目标用户</h3>
+            <p>内容...</p>
+            
+            <!-- 其他章节... -->
+            
+            <hr>
+            
+            <!-- 质量检查报告 -->
+            <h2 id="sec-report">质量检查报告</h2>
+            <!-- 报告内容... -->
+        </div>
+    </div>
+    
+    <script>
+        // Mermaid初始化
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+        
+        // 悬浮目录高亮
+        document.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('.float-toc a');
+            const sections = document.querySelectorAll('h2');
+            
+            window.addEventListener('scroll', function() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.offsetHeight;
+                    if (pageYOffset >= sectionTop - 100 && pageYOffset < sectionTop + sectionHeight - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                links.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + current) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+```
+
+### HTML输出要求
+1. **必须是完整的HTML文件**：包含完整的html、head、body标签
+2. **引入Mermaid支持**：通过CDN引入mermaid.min.js，支持流程图渲染
+3. **悬浮目录**：右侧固定悬浮目录，支持锚点跳转和高亮
+4. **样式美观**：使用现代化样式，ToB风格
+5. **响应式设计**：适配桌面端和移动端
+6. **表格美化**：带边框、hover效果
+7. **代码高亮**：代码块带背景色
+8. **打印友好**：支持打印和导出PDF
+
 ## 检查清单
 
 ### 完整性检查
@@ -340,10 +504,22 @@ scope: global
 - 主要问题：...
 ```
 
-### 2. 最终PRD文档
+### 2. 最终PRD文档（HTML格式 - 主要输出）
+输出文件名：`PRD_V1.0.0.html`
+
+**【强制要求】HTML格式PRD必须严格按照以下规范：**
+
+1. **完整HTML结构**：必须包含完整的html、head、body标签
+2. **Mermaid支持**：必须通过CDN引入mermaid.min.js，流程图放入<div class="mermaid">容器
+3. **悬浮目录**：右侧固定悬浮目录，支持锚点跳转和滚动高亮
+4. **样式美观**：现代化ToB风格，清晰的视觉层次
+5. **响应式设计**：适配桌面端和移动端
+6. **打印友好**：支持打印和导出PDF
+
+### 3. 最终PRD文档（MD格式 - 可下载）
 输出文件名：`PRD_V1.0.0.md`
 
-**【强制要求】最终PRD必须严格按照以下规范：**
+**【强制要求】MD格式PRD必须严格按照以下规范：**
 
 1. **目录结构**：必须包含所有8个章节，顺序固定，**绝对禁止修改**
 2. **目录导航**：必须在文档开头添加可点击的目录导航
@@ -361,9 +537,9 @@ scope: global
 - 第7-8章：来自 prd-plan-section
 
 ## 输出要求
+- **输出格式策略**：HTML为主（预览展示），MD作为可下载文件
 - 检查报告必须列出所有问题
 - 优化建议必须 actionable
-- 最终PRD必须格式统一
 - **最终PRD必须严格按照标准目录结构输出，不得随意增删章节或改变顺序**
 - **每个子章节内容不能为空，必须输出"暂无"或实际内容**
 - **目录导航必须放在文档开头，便于快速跳转**
@@ -371,5 +547,6 @@ scope: global
 - **绝对禁止重复输出，只输出一份完整PRD文档和一份质量检查报告**
 - **如果章节顺序混乱，必须自动按标准顺序重新排列**
 - **如果发现重复内容，必须自动去重**
+- **HTML版本必须包含悬浮目录和Mermaid渲染支持**
 - 全程使用中文
 - **当输入包含多轮对话历史时，必须智能识别并提取所有章节内容，而不仅仅是最后一步的结果**
