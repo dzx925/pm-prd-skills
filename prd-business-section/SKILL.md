@@ -1,6 +1,6 @@
 ---
 name: prd-business-section
-version: 1.1.0
+version: 1.2.0
 description: PRD业务章节生成器，生成PRD第1-3章（业务场景、问题来源、目标）
 scope: global
 ---
@@ -53,6 +53,17 @@ scope: global
   ### 1.1 目标用户
   暂无
   ```
+
+## 输出说明
+
+- **输出文件**：section_1_3_business.md
+- **使用方**：prd-optimizer（作为PRD第1-3章）
+- **章节对应**：
+  - 第1章：业务场景（1.1-1.4）
+  - 第2章：问题来源（2.1-2.2）
+  - 第3章：目标（3.1-3.3）
+- **格式要求**：Markdown，必须包含所有标准子章节
+- **下游依赖**：prd-optimizer 会将此输出整合到最终PRD的第1-3章
 
 ## 输出要求
 - 目标必须可量化
