@@ -1,6 +1,6 @@
 ---
 name: solution-merger
-version: 1.3.0
+version: 1.4.0
 description: 方案合并器，合并方案框架和各功能模块，生成完整的PRD第5章
 scope: global
 ---
@@ -49,6 +49,17 @@ scope: global
   ### 5.1 业务流程
   暂无
   ```
+
+## 输出说明
+
+- **输出文件**：section_5_solution.md
+- **使用方**：prd-optimizer（作为PRD第5章）
+- **章节对应**：第5章：产品方案（5.1-5.6）
+- **格式要求**：Markdown，必须包含所有标准子章节
+- **上游依赖**：
+  - solution-framework（提供方案框架）
+  - feature-module-generator（提供各模块详情）
+- **下游依赖**：prd-optimizer 会将此输出整合到最终PRD的第5章
 
 ## 输出要求
 - 必须包含所有6个子章节
