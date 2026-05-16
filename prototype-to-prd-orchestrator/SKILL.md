@@ -1,7 +1,7 @@
 ---
 name: prototype-to-prd-orchestrator
-version: 2.0.0
-description: PRD生成编排器，直接根据业务场景和原型信息生成完整的HTML格式PRD文档
+version: 2.1.0
+description: PRD生成编排器，直接根据业务场景和原型信息生成完整的HTML格式PRD文档，支持步骤状态输出
 scope: global
 ---
 
@@ -13,6 +13,7 @@ scope: global
 1. 分析用户提供的业务场景和原型信息
 2. 生成完整的PRD文档（包含所有8个章节）
 3. 输出格式为纯HTML，不输出MD文件
+4. 在输出HTML前发送步骤状态标记
 
 ## 目录锁定约束（强制）
 
@@ -134,8 +135,33 @@ scope: global
 - **HTML原型**（可选）：用户提供的原型HTML代码
 - **YAML数据**（可选）：结构化数据信息
 
-## 输出格式
-**仅输出HTML格式**，包含以下结构：
+## 输出格式（关键！）
+
+**输出必须包含步骤状态标记和HTML内容，格式如下：**
+
+```
+[STEP:0] 正在生成业务章节（第1-3章）...
+[STEP:1] 正在生成分析章节（第4章）...
+[STEP:2] 正在生成产品方案（第5章）...
+[STEP:3] 正在生成非功能性需求（第6章）...
+[STEP:4] 正在生成上线计划与附录（第7-8章）...
+[PRD]
+<!DOCTYPE html>
+<html lang="zh-CN">
+...完整HTML内容...
+</html>
+```
+
+### 步骤状态标记说明
+| 步骤索引 | 章节 | 描述示例 |
+|---------|------|---------|
+| [STEP:0] | 业务章节 | 正在生成业务章节（第1-3章）... |
+| [STEP:1] | 分析章节 | 正在生成分析章节（第4章）... |
+| [STEP:2] | 产品方案 | 正在生成产品方案（第5章）... |
+| [STEP:3] | 非功能性需求 | 正在生成非功能性需求（第6章）... |
+| [STEP:4] | 上线计划与附录 | 正在生成上线计划与附录（第7-8章）... |
+
+### HTML内容要求
 1. HTML文档头部（包含样式）
 2. 目录导航（悬浮或固定）
 3. 所有章节内容
@@ -150,32 +176,22 @@ scope: global
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PRD文档 - [产品名称]</title>
     <style>
-        /* 样式定义 */
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         .toc { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); }
-        /* 更多样式 */
     </style>
 </head>
 <body>
-    <!-- 目录导航 -->
     <div class="toc">
         <ul>
             <li><a href="#section1">一、业务场景</a></li>
-            <!-- 更多目录项 -->
         </ul>
     </div>
-    
-    <!-- 文档内容 -->
     <div class="content">
         <h1>PRD文档标题</h1>
-        
         <h2 id="section1">一、业务场景</h2>
         <h3>1.1 目标用户</h3>
         <p>...</p>
-        <!-- 更多章节 -->
     </div>
-    
-    <!-- Mermaid支持 -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>mermaid.initialize({ startOnLoad: true });</script>
 </body>
@@ -183,11 +199,13 @@ scope: global
 ```
 
 ## 执行流程
-1. 分析输入的业务场景和原型信息
-2. 根据目录模板生成完整PRD结构
-3. 为每个章节填充内容（基于业务场景分析）
-4. 添加目录导航和样式
-5. 输出完整HTML文档
+1. 输出 [STEP:0] 标记，表示开始生业务章节
+2. 输出 [STEP:1] 标记，表示开始生分析章节
+3. 输出 [STEP:2] 标记，表示开始生产品方案
+4. 输出 [STEP:3] 标记，表示开始生非功能性需求
+5. 输出 [STEP:4] 标记，表示开始生上线计划
+6. 输出 [PRD] 标记，表示开始输出PRD内容
+7. 输出完整HTML文档
 
 ## 强制约束
 - **仅输出HTML**：禁止输出任何MD格式内容
@@ -195,7 +213,8 @@ scope: global
 - **禁止重复**：只能输出一份完整PRD文档
 - **内容完整**：每个章节都必须有内容，无内容填"暂无"
 - **中文输出**：全程使用中文
+- **必须包含步骤标记**：必须按格式输出 [STEP:N] 标记和 [PRD] 标记
 
 ---
 
-**输出要求**：直接输出完整的HTML格式PRD文档，不要输出其他任何解释性文字。
+**输出要求**：按照上述格式输出步骤状态标记和完整HTML文档。
