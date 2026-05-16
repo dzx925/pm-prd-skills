@@ -1,7 +1,7 @@
 ---
 name: prd-preparation-section
-version: 1.5.0
-description: PRD非功能性需求生成器，生成PRD第6章（非功能性需求：性能、权限、兼容、可维护）
+version: 1.6.0
+description: PRD非功能性需求生成器，生成PRD第6章（非功能性需求：性能、权限、兼容、可维护），输出内容供prd-optimizer整合
 scope: global
 ---
 
@@ -34,10 +34,9 @@ scope: global
 3. **生成权限控制**：功能权限、数据权限
 4. **生成兼容性**：浏览器、分辨率、移动端
 5. **生成可维护性**：代码规范、监控告警
-6. **输出Markdown格式**
+6. **输出章节内容**
 
 ## 输出规范
-### 输出文件名：section_6_non_functional.md
 
 ```markdown
 ## 六、非功能性需求
@@ -58,7 +57,7 @@ scope: global
 
 ## 输出说明
 
-- **输出文件**：section_6_non_functional.md
+- **输出内容**：section_6_non_functional（章节内容，无文件后缀）
 - **使用方**：prd-optimizer（作为PRD第6章）
 - **章节对应**：第6章：非功能性需求（6.1-6.4）
 - **格式要求**：Markdown，必须包含所有标准子章节
@@ -70,3 +69,4 @@ scope: global
 - 全程使用中文
 - **禁止输出目录导航**：只输出章节内容，不包含目录导航
 - **禁止输出文档信息**：不包含版本号、日期等元数据
+- **禁止输出文件名**：只输出章节内容，不提及输出文件名
