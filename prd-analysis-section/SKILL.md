@@ -1,7 +1,7 @@
 ---
 name: prd-analysis-section
-version: 1.3.0
-description: PRD分析章节生成器，生成PRD第4章（竞品情况）
+version: 1.4.0
+description: PRD分析章节生成器，生成PRD第4章（竞品情况），输出内容供prd-optimizer整合
 scope: global
 ---
 
@@ -33,10 +33,9 @@ scope: global
 2. **选取对标竞品**：选择2-3个主流ToB竞品
 3. **功能对标分析**：对比核心功能的优劣势
 4. **总结行业实践**：提炼行业通用做法
-5. **输出竞品章节**：生成Markdown格式
+5. **输出竞品章节**：生成章节内容
 
 ## 输出规范
-### 输出文件名：section_4_analysis.md
 
 ```markdown
 ## 四、竞品情况
@@ -56,7 +55,7 @@ scope: global
 
 ## 输出说明
 
-- **输出文件**：section_4_analysis.md
+- **输出内容**：section_4_analysis（章节内容，无文件后缀）
 - **使用方**：prd-optimizer（作为PRD第4章）
 - **章节对应**：第4章：竞品情况（4.1-4.3）
 - **格式要求**：Markdown，必须包含所有标准子章节
@@ -69,3 +68,4 @@ scope: global
 - 全程使用中文
 - **禁止输出目录导航**：只输出章节内容，不包含目录导航
 - **禁止输出文档信息**：不包含版本号、日期等元数据
+- **禁止输出文件名**：只输出章节内容，不提及输出文件名
